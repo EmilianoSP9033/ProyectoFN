@@ -1,0 +1,387 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Satisfy&display=swap');
+
+/* Estilos generales */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif ;
+    line-height: 1.6;
+    color: #ffffff;
+    background-color: #000000;
+}
+
+.container { /*Se utiliza para modificar la anchura, etc*/
+    width: 80%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Estilos para el titulo */
+.header {
+    background-color: #000000;
+    padding: 0.5rem 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    text-align: center;
+}
+
+.header-top {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+
+.logo img {
+    max-width: 75px; /* Ajusta según necesidad */
+    height: auto;
+    display: block;
+}
+
+.nav-menu {
+    background-color: #000000;
+    padding: 0.5rem 0;
+}
+
+.nav-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.nav-menu ul li {
+    display: inline;
+}
+
+.nav-menu ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.nav-menu ul li a:hover {
+    color: #787b84;
+}
+.login-btn {
+    display: inline-block;
+    margin-left: 0px;
+    text-decoration: none;
+}
+
+.login-icon {
+    width: 60%; /* Ajusta el tamaño según necesites */
+    height: 60%;
+    cursor: pointer;
+}
+
+
+
+.header-content { /*modifica contenido del header*/
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 3rem;
+}
+
+.header-txt { /*modifica tamaño de espacio del txt*/
+    max-width: 1000px;
+}
+
+.header-txt h1 { /*tamaño letra y espacio de parrafo*/
+    font-size: 45px;
+    margin-bottom: 20px;
+
+}
+
+.header-txt p { /*modifica el espaico de imageen*/
+    margin-bottom: 20px;
+}
+
+
+.header-img img { /*modifica imagen principal*/
+    max-width: 100%;
+    border-radius: 19px;
+    box-shadow: 0 4px 15px rgb(0, 0, 0); /*sobra de recuadros*/
+
+}
+
+
+/*Video part*/
+.video-container {
+    position: relative;
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+}
+
+.video-container video {
+    width: 100%;
+    height: 100vh; /* Para que ocupe toda la pantalla */
+    object-fit: cover; /* Asegura que se vea bien en cualquier dispositivo */
+}
+
+
+.video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4); /* Ajusta la opacidad según tu preferencia */
+}
+
+
+
+/* Sección ofertas */
+.services {
+    text-align: center;
+    padding: 4rem 0;
+    background-color: #000000;
+}
+
+.services h2 {
+    font-size: 2.5rem;
+    color: #ffffff;
+    font-weight: bold;
+    text-shadow: 0 4px 10px rgba(255, 255, 255, 0.5);
+    margin-bottom: 2rem;
+}
+
+.services-container {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.service-card {
+    position: relative;
+    width: 350px;
+    height: 250px;
+    border-radius: 15px;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+}
+
+.service-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
+}
+
+.service-card h3 {
+    background: rgba(0, 0, 0, 0.7);
+    color: #ffffff;
+    padding: 15px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+    transition: background 0.3s ease-in-out;
+}
+
+.service-card:hover h3 {
+    background: rgba(49, 47, 47, 0.8);
+}
+
+.prueba-manejo {
+    background-image: url("images/imagen_prueba_manejo.jpg");
+}
+
+.cita-servicio {
+    background-image: url("images/imagen_cita_servicio.jpg");
+}
+
+.cita-vendedor {
+    background-image: url("images/imagen_cita_vendedor.jpg");
+}
+
+.contacto { /*cambia el fondo y alinea al centro*/
+    background-color: #232222;
+    padding: 4rem 0;
+    text-align: center;
+}
+
+.contacto h2 { /*modifica el subtitle*/
+    font-size: 2rem;
+    color: #ffffff;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px rgb(255, 255, 255);
+}
+
+.contacto p { /*modica el parraf*/
+    font-size: 1rem;
+    color: #a8a8a8;
+    margin-bottom: 2rem;
+}
+
+.contact-form { /*modifica el lugar del form*/
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.contact-form label { /*modifica el texto del form*/
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #d5d5d5;
+}
+
+
+.footer {
+    background-color: #000000;
+    color: #ffffff;
+    padding: 2rem 0;
+    text-align: center;
+    border-top: 2px solid #ffffff;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 80%;
+    margin: 0 auto;
+}
+
+.footer-section.brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: left;
+}
+
+.footer-section.social {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.footer-section.social a {
+    font-size: 1.5rem;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.footer-section.social a:hover {
+    color: #ccc;
+}
+
+
+
+/* Sección ofertas */
+.ofert {
+    text-align: center;
+    padding: 4rem 0;
+}
+
+.ofert h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgb(255, 255, 255);
+}
+
+.ofer-content {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+/* Estilos generales para los recuadros */
+.ofert-1 {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: white;
+    text-align: center;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    height: 300px;
+    min-height: 250px;
+    padding: 1rem;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, filter 0.3s ease-in-out;
+}
+
+/* Animaciones al pasar el cursor */
+.ofert-1:hover {
+    transform: scale(1.05) rotateX(5deg) rotateY(5deg);
+    box-shadow: 0 10px 20px rgba(255, 255, 255, 0.3);
+    filter: brightness(1.2);
+}
+
+.ofert-1:not(:hover) {
+    opacity: 0.8;
+}
+
+/* Estilos para los textos dentro de los recuadros */
+.ofert-1 h3,
+.ofert-1 p {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 10px;
+    border-radius: 5px;
+    margin: 5px;
+}
+
+/* Aplicando la imagen como fondo */
+.prueba-manejo {
+    background-image: url("images/imagen prueba de conduccion.jpg");
+}
+
+.cita-servicio {
+    background-image: url("images/imagen mantenimiento.jpg");
+}
+
+.cita-vendedor {
+    background-image: url("images/imagen cita servicio.jpeg");
+}
+
+
+
+/* Responsividad para pantalla de cel*/
+@media (max-width: 768px) {
+    .nav-menu ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    nav ul li a {
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+
+    .services-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
+    }
+    .footer-section.social {
+        justify-content: center;
+        margin-top: 10px;
+    }
+}

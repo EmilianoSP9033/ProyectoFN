@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto - Citas para Automóviles</title>
+    <link rel="stylesheet" href="contactos.css">
+    <script src="server.js" defer></script>
+</head>
+<body>
+
+    
+        
+    <section>
+        <header class="header">
+            <div class="header-top">
+                <a href="#" class="logo"><img src="/images/LOGO ALLCARS.png" alt="logo"></a>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="/index.html">INICIO</a></li>
+                    <li><a href="/vehiculos/vehículos.html">VEHICULOS</a></li>
+                    <li><a href="/servicios/servicios.html">SERVICIOS</a></li>
+                    <li><a href="/contactos/contactos.html">CONTACTO</a></li>
+                    <li><a href="/nosotros/nosotros.html">NOSOTROS</a></li>
+                    <li><a href="/login.html">INICIAR SESION</a></li>
+                </ul>
+            </nav>
+        </header>
+    <section>
+
+    <section class="form-section">
+        <h1>COMPÁRTENOS TUS DATOS PARA AGENDAR UNA CITA CON UN VENDEDOR</h1>
+        <form class="form-container">
+            <div class="form-group">
+                <fieldset>
+                    <legend>TUS DATOS:</legend>
+                    <label for="nombre">Nombre*</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                    
+                    <label for="apellido">Apellido*</label>
+                    <input type="text" id="apellido" name="apellido" required>
+                    
+                    <label for="email">Correo electrónico*</label>
+                    <input type="email" id="email" name="email" required>
+                    
+                    <label for="telefono">Teléfono*</label>
+                    <input type="tel" id="telefono" name="telefono" required>
+                </fieldset>
+            </div>
+
+            <div class="form-group">
+                <fieldset>
+                    <legend>SOBRE LA CITA:</legend>
+                    <label for="vehiculo_interes">Vehículo de interés*</label>
+                    <input type="text" id="vehiculo_interes" name="vehiculo_interes" required>
+
+                    <label for="fecha_cita">Fecha deseada de la cita*</label>
+                    <input type="date" id="fecha_cita" name="fecha_cita" required>
+
+                    <label for="visitado">¿Visitó la agencia anteriormente?</label>
+                    <select id="visitado" name="visitado">
+                        <option value="">Seleccione</option>
+                        <option value="si">Sí</option>
+                        <option value="no">No</option>
+                    </select>
+
+                </fieldset>
+            </div>
+
+            <div class="form-options">
+                <label>
+                    <input type="checkbox" name="promociones">
+                    Recibir promociones
+                </label>
+
+                <label>
+                    <input type="checkbox" name="privacidad" required>
+                    He leído y aceptado la Política de Privacidad
+                </label>
+            </div>
+            <button type="submit">ENVIAR</button>
+        </form>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content container">
+            <div class="footer-section brand">
+                <h3>ALL CARS</h3>
+            </div>
+            <div class="footer-section social">
+                <a href="https://www.facebook.com/"><ion-icon name="logo-facebook"></ion-icon></a>
+                <a href="https://www.instagram.com/accounts/login/"><ion-icon name="logo-instagram"></ion-icon></a>
+                <a href="https://x.com/i/flow/login?lang=es"><ion-icon name="logo-twitter"></ion-icon></a>
+                <a href="https://www.linkedin.com/login/es"><ion-icon name="logo-linkedin"></ion-icon></a>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+
+
+    <script>
+        document.querySelector('.form-container').addEventListener('submit', function(e) {
+            e.preventDefault(); // Evitar el envío tradicional del formulario
+            
+            const formData = new FormData(this); // Obtener los datos del formulario
+            const data = new URLSearchParams(); // Crear un objeto para enviar los datos
+
+            formData.forEach((value, key) => {
+                data.append(key, value); // Agregar cada dato del formulario a 'data'
+            });
+
+            // Enviar los datos al backend usando fetch
+            fetch('/guardar-cita', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: data.toString(),
+            })
+            .then(response => response.text())
+            .then(result => {
+                alert(result); // Mostrar mensaje de éxito
+            })
+            .catch(error => {
+                alert("Error al enviar los datos.");
+                console.error("Error:", error);
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+</body>
+</html>
