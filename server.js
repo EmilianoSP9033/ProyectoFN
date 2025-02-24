@@ -3,7 +3,6 @@ const path = require('path');
 const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 
-
 const saltRounds = 10; // Define la constante saltRounds
 
 // Crear la aplicación Express
