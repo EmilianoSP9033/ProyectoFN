@@ -1,21 +1,40 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const bcrypt = require('bcrypt');
+const dotenv = require('dotenv');
+const cors = require('cors');
+const path = require('path');
+const bcrypt = require('bcryptjs');
+const saltRounds = 10;
 
-const saltRounds = 10; // Definir la constante saltRounds
+dotenv.config();
 
 const app = express();
-const port = 3000;
 
-// Conexión a MongoDB Atlas
-mongoose.connect('your_mongodb_atlas_connection_string', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => console.log('Conectado a MongoDB Atlas'))
-  .catch(err => console.error('Error de conexión:', err));
+app.use(cors({
+    origin: '*'
+}));
+app.use(express.json());
 
-// Definir esquemas y modelos
+// Conexión a MongoDB
+const connectDB = async () => {
+    try {
+        if (mongoose.connections[0].readyState) {
+            return;
+        }
+        await mongoose.connect(process.env.MONGO_URI, {
+            ssl: true,
+        });
+        console.log('Conexión a MongoDB exitosa');
+    } catch (err) {
+        console.error('Error al conectar a MongoDB:', err);
+        throw err;
+    }
+};
+
+// Asegurarnos de que la conexión se establezca
+connectDB();
+
+// Definición de modelos
 const UsuarioSchema = new mongoose.Schema({
     nombre_usuario: String,
     correo_electronico: { type: String, unique: true },
@@ -43,11 +62,7 @@ const AutoSchema = new mongoose.Schema({
 });
 const Auto = mongoose.model('Auto', AutoSchema);
 
-// Middleware para procesar JSON y datos URL-encoded
-app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// Registro de usuario
+// Rutas
 app.post('/registrar-usuario', async (req, res) => {
     const { nombre_usuario, correo_electronico, contrasena } = req.body;
     if (!nombre_usuario || !correo_electronico || !contrasena) {
@@ -131,6 +146,30 @@ app.delete('/autos/:id', async (req, res) => {
     }
 });
 
-app.listen(port, () => {
-    console.log(`Servidor escuchando en http://localhost:${port}`);
+// Ruta para la salud de la API
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', message: 'API funcionando correctamente' });
 });
+
+// Ruta para la raíz
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '/index.html'));
+});
+
+
+// Manejo de errores
+app.use((err, req, res, next) => {
+    console.error(err);
+    res.status(500).json({ 
+        error: 'Error interno del servidor',
+        message: err.message 
+    });
+});
+
+// Iniciar el servidor
+const PORT = process.env.PORT || 4003;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
+});
+
+module.exports = app;
