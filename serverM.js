@@ -6,9 +6,14 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const saltRounds = 10;
 
+
+
 dotenv.config();
 
 const app = express();
+
+// Servir archivos estáticos
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors({
     origin: '*'
