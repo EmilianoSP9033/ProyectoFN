@@ -35,15 +35,17 @@
 <script>
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
             e.preventDefault();
+            
 
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
+            const correo_electronico = req.body.correo_electronico || req.body.email;
+            const contrasena = req.body.contrasena || req.body.password;
+
 
             try {
                 const response = await fetch("/login", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "app/json"
+                        "Content-Type": "application/json"
                     },
                     body: JSON.stringify({ email, password })
                 });

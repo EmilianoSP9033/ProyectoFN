@@ -1,39 +1,32 @@
-document.getElementById("loginForm").addEventListener("submit", async function (e) {
-    e.preventDefault(); // Prevenir el envío normal del formulario
-  
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-    // Verificación manual para el admin
-    if (email === "admin@allcars.com" && password === "admin123") {
-        window.location.href = "admin.html";
-        return;
-    }
+    const correo_electronico = document.getElementById("email").value.trim();
+    const contrasena = document.getElementById("password").value.trim();
+
+    console.log("📤 Enviando datos:", { correo_electronico, contrasena });
 
     try {
-        // Intentar login con MongoDB
         const response = await fetch("http://localhost:3000/login", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "application/json"
             },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ correo_electronico, contrasena })
         });
 
         const result = await response.json();
+        console.log("📩 Respuesta del servidor:", result);
 
-        if (response.ok && result.success) {
-            // Almacenar el token JWT en localStorage
+        if (result.success) {
+            alert("Inicio de sesión exitoso");
             localStorage.setItem("authToken", result.token);
-            
-            // Redirigir al usuario si el login es exitoso
-            window.location.href = "index.html";
+            window.location.href = "/index.html";
         } else {
-            // Mostrar error si el login falla
-            alert(result.message || "Error al iniciar sesión.");
+            alert(result.message);
         }
     } catch (error) {
-        console.error("Error en la solicitud:", error);
+        console.error("❌ Error en el inicio de sesión:", error);
         alert("No se pudo conectar con el servidor.");
     }
 });

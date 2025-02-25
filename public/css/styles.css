@@ -201,15 +201,15 @@ body {
 }
 
 .prueba-manejo {
-    background-image: url("images/imagen_prueba_manejo.jpg");
+    background-image: url("/public/images/Imagen_prueba_de_conduccion");
 }
 
 .cita-servicio {
-    background-image: url("images/imagen_cita_servicio.jpg");
+    background-image: url("/images/imagen_cita_servicio.jpg");
 }
 
 .cita-vendedor {
-    background-image: url("images/imagen_cita_vendedor.jpg");
+    background-image: url("/images/imagen_cita_vendedor.jpg");
 }
 
 .contacto { /*cambia el fondo y alinea al centro*/

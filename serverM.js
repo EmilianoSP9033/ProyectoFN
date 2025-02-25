@@ -5,6 +5,8 @@ const cors = require('cors');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const saltRounds = 10;
+const jwt = require('jsonwebtoken');
+
 
 dotenv.config();
 const app = express();
@@ -16,8 +18,9 @@ app.use(cors({
     origin: '*'
 }));
 
-app.use(express.json());  
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));  
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
 
 // Conexión a MongoDB
 const connectDB = async () => {
@@ -108,26 +111,37 @@ app.post('/registrar-usuario', async (req, res) => {
 
 // Inicio de sesión
 app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        return res.status(400).send("Todos los campos son obligatorios.");
+    console.log("📥 Datos recibidos en login:", req.body); 
+
+    const { correo_electronico, contrasena } = req.body;
+    if (!correo_electronico || !contrasena) {
+        console.log("❌ Faltan campos en la solicitud. Recibido:", req.body);
+        return res.status(400).json({ message: "Todos los campos son obligatorios." });
     }
+
     try {
-        const usuario = await Usuario.findOne({ correo_electronico: email });
-        if (!usuario) return res.status(401).send("Correo o contraseña incorrectos.");
-        const passwordMatch = await bcrypt.compare(password, usuario.contrasena);
-        if (passwordMatch) {
-            // Crear el token JWT
-            const token = jwt.sign({ userId: usuario._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-            res.json({ success: true, message: "Inicio de sesión exitoso", token });
-        } else {
-            res.status(401).send("Correo o contraseña incorrectos.");
+        const usuario = await Usuario.findOne({ correo_electronico });
+        if (!usuario) {
+            console.log("❌ Usuario no encontrado:", correo_electronico);
+            return res.status(401).json({ message: "Correo o contraseña incorrectos." });
         }
+
+        const passwordMatch = await bcrypt.compare(contrasena, usuario.contrasena);
+        if (!passwordMatch) {
+            console.log("❌ Contraseña incorrecta para:", correo_electronico);
+            return res.status(401).json({ message: "Correo o contraseña incorrectos." });
+        }
+
+        const token = jwt.sign({ userId: usuario._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        console.log("✅ Inicio de sesión exitoso:", correo_electronico, "Token generado:", token);
+
+        res.json({ success: true, message: "Inicio de sesión exitoso", token });
     } catch (error) {
-        console.error("Error en el inicio de sesión:", error);
-        res.status(500).send("Error en el servidor.");
+        console.error("🔥 Error en el login:", error);
+        res.status(500).json({ message: "Error en el servidor." });
     }
 });
+
 // Guardar una cita
 app.post('/guardar-cita', async (req, res) => {
     try {
@@ -163,6 +177,7 @@ app.post('/guardar-mantenimiento', async (req, res) => {
 // Guardar un auto
 app.post('/guardar-auto', async (req, res) => {
     try {
+        console.log("Datos recibidos en /guardar-auto:", req.body); // 👈 Verifica qué datos llegan
         const nuevoAuto = new Auto(req.body);
         await nuevoAuto.save();
         res.send("Auto guardado exitosamente.");
@@ -171,6 +186,49 @@ app.post('/guardar-auto', async (req, res) => {
         res.status(500).send("Error al guardar el auto.");
     }
 });
+
+
+// Obtener todos los autos
+app.get('/obtener-autos', async (req, res) => {
+    try {
+        const autos = await Auto.find();
+        res.json(autos);
+    } catch (error) {
+        console.error("Error al obtener autos:", error);
+        res.status(500).send("Error al obtener los autos.");
+    }
+});
+
+// Eliminar un auto por ID
+app.delete('/eliminar-auto/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        await Auto.findByIdAndDelete(id);
+        res.send("Auto eliminado exitosamente.");
+    } catch (error) {
+        console.error("Error al eliminar el auto:", error);
+        res.status(500).send("Error al eliminar el auto.");
+    }
+});
+
+// Editar un auto
+app.put('/editar-auto', async (req, res) => {
+    try {
+        const { id, marca, modelo, precio } = req.body;
+        const autoActualizado = await Auto.findByIdAndUpdate(id, { marca, modelo, precio }, { new: true });
+
+        if (!autoActualizado) {
+            return res.status(404).send("Auto no encontrado.");
+        }
+
+        res.send("Auto actualizado correctamente.");
+    } catch (error) {
+        console.error("Error al editar el auto:", error);
+        res.status(500).send("Error al actualizar el auto.");
+    }
+});
+
+
 
 // Ruta para la salud de la API
 app.get('/api/health', (req, res) => {
@@ -197,5 +255,6 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
+
 
 module.exports = app;
