@@ -1,17 +1,15 @@
+const API_URL = "https://crispy-engine-5grj7jpvvrjp349q6-3000.app.github.dev"; 
+
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const correo_electronico = document.getElementById("email").value.trim();
     const contrasena = document.getElementById("password").value.trim();
 
-    console.log("📤 Enviando datos:", { correo_electronico, contrasena });
-
     try {
-        const response = await fetch("http://localhost:3000/login", {
+        const response = await fetch(`${API_URL}/login`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ correo_electronico, contrasena })
         });
 
