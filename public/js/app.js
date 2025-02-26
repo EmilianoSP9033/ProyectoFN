@@ -1,4 +1,4 @@
-const API_URL = "https://crispy-engine-5grj7jpvvrjp349q6-3000.app.github.dev"; 
+const API_URL = "https://crispy-engine-5grj7jpvvrjp349q6-3000.app.github.dev";
 
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -6,11 +6,17 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     const correo_electronico = document.getElementById("email").value.trim();
     const contrasena = document.getElementById("password").value.trim();
 
+    // Verificar si el usuario es admin
+    if (correo_electronico === "admin@allcars.com" && contrasena === "admin123") {
+        window.location.href = "admin.html";
+        return;
+    }
+
     try {
         const response = await fetch(`${API_URL}/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ correo_electronico, contrasena })
+            body: JSON.stringify({ correo_electronico, contrasena }),
         });
 
         const result = await response.json();
