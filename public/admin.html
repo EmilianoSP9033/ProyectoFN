@@ -44,125 +44,104 @@
     </section>
 
     <script>
-        const carForm = document.getElementById('carForm');
-        const carTable = document.getElementById('carTable').getElementsByTagName('tbody')[0];
-        const API_URL = 'http://localhost:3000/guardar-auto';
+        const API_URL = "https://crispy-engine-5grj7jpvvrjp349q6-3000.app.github.dev";
 
-        carForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+document.addEventListener("DOMContentLoaded", () => {
+    const carForm = document.getElementById("carForm");
+    const carTable = document.getElementById("carTable").querySelector("tbody");
+    let editingCarId = null; // Guardar el ID del auto en edición
+
+    // Obtener autos desde el backend
+    async function fetchAutos() {
+        try {
+            const response = await fetch(`${API_URL}/obtener-autos`);
+            if (!response.ok) throw new Error("Error al obtener los autos");
             
-            const marca = document.getElementById('marca').value;
-            const modelo = document.getElementById('modelo').value;
-            const precio = document.getElementById('precio').value;
+            const autos = await response.json();
+            carTable.innerHTML = "";
+            
+            autos.forEach(auto => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${auto.marca}</td>
+                    <td>${auto.modelo}</td>
+                    <td>$${auto.precio.toLocaleString()}</td>
+                    <td>
+                        <button onclick="editAuto('${auto._id}', '${auto.marca}', '${auto.modelo}', ${auto.precio})">✏️ Editar</button>
+                        <button onclick="deleteAuto('${auto._id}')">🗑️ Eliminar</button>
+                    </td>
+                `;
+                carTable.appendChild(row);
+            });
+        } catch (error) {
+            console.error("❌ Error al obtener los autos:", error);
+        }
+    }
 
-            if (marca && modelo && precio) {
-                const car = { marca, modelo, precio: parseFloat(precio) };
+    // Agregar o actualizar un auto
+    carForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-                try {
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(car)
-                    });
-
-                    if (response.ok) {
-                        alert("Auto agregado correctamente.");
-                        carForm.reset();
-                        fetchAutos(); // Actualizar tabla
-                    } else {
-                        const errorText = await response.text();
-                        alert(`Error: ${errorText}`);
-                    }
-                } catch (error) {
-                    console.error("Error al agregar el auto:", error);
-                }
-            } else {
-                alert("Todos los campos son obligatorios.");
-            }
-        });
-
-        async function fetchAutos() {
-            try {
-                const response = await fetch('http://localhost:3000/obtener-autos');
-                const autos = await response.json();
-
-                carTable.innerHTML = '';
-                autos.forEach(auto => {
-                    const row = carTable.insertRow();
-                    row.innerHTML = `
-                        <td>${auto.marca}</td>
-                        <td>${auto.modelo}</td>
-                        <td>${auto.precio}</td>
-                        <td>
-                            <button onclick="editAuto(${auto.id})">Editar</button>
-                            <button onclick="deleteAuto(${auto.id})">Eliminar</button>
-                        </td>
-                    `;
-                });
-            } catch (error) {
-                console.error("Error al obtener los autos:", error);
-            }
+        const marca = document.getElementById("marca").value.trim();
+        const modelo = document.getElementById("modelo").value.trim();
+        const precio = parseFloat(document.getElementById("precio").value);
+        
+        if (!marca || !modelo || isNaN(precio) || precio <= 0) {
+            alert("❌ Todos los campos son obligatorios y el precio debe ser mayor a 0.");
+            return;
         }
 
-        async function editAuto(id) {
-            const row = carTable.rows[id - 1]; // Asegúrate de ajustar el índice si es necesario
-            const marca = row.cells[0].innerText;
-            const modelo = row.cells[1].innerText;
-            const precio = row.cells[2].innerText;
+        const car = { marca, modelo, precio };
+        let url = editingCarId ? `${API_URL}/editar-auto/${editingCarId}` : `${API_URL}/guardar-auto`;
+        let method = editingCarId ? "PUT" : "POST";
 
-            document.getElementById('marca').value = marca;
-            document.getElementById('modelo').value = modelo;
-            document.getElementById('precio').value = precio;
+        try {
+            const response = await fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(car)
+            });
 
-            carForm.onsubmit = async (e) => {
-                e.preventDefault();
+            if (!response.ok) throw new Error("Error al procesar la solicitud.");
 
-                const updatedCar = {
-                    id,
-                    marca: document.getElementById('marca').value,
-                    modelo: document.getElementById('modelo').value,
-                    precio: parseFloat(document.getElementById('precio').value),
-                };
-
-                try {
-                    const response = await fetch('http://localhost:3000/editar-auto', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(updatedCar)
-                    });
-
-                    if (response.ok) {
-                        alert("Auto actualizado correctamente.");
-                        fetchAutos(); // Actualizar tabla
-                        carForm.reset();
-                    } else {
-                        const errorText = await response.text();
-                        alert(`Error: ${errorText}`);
-                    }
-                } catch (error) {
-                    console.error("Error al editar el auto:", error);
-                }
-            };
+            alert(editingCarId ? "✅ Auto actualizado correctamente." : "✅ Auto agregado correctamente.");
+            carForm.reset();
+            editingCarId = null;
+            fetchAutos();
+        } catch (error) {
+            console.error("❌ Error al procesar el auto:", error);
+            alert("❌ Hubo un problema, intenta de nuevo.");
         }
+    });
 
-        async function deleteAuto(id) {
-            try {
-                const response = await fetch(`http://localhost:3000/eliminar-auto/${id}`, { method: 'DELETE' });
+    // Editar auto
+    window.editAuto = (id, marca, modelo, precio) => {
+        document.getElementById("marca").value = marca;
+        document.getElementById("modelo").value = modelo;
+        document.getElementById("precio").value = precio;
+        editingCarId = id;
+    };
 
-                if (response.ok) {
-                    alert("Auto eliminado correctamente.");
-                    fetchAutos(); // Actualizar tabla
-                } else {
-                    const errorText = await response.text();
-                    alert(`Error: ${errorText}`);
-                }
-            } catch (error) {
-                console.error("Error al eliminar el auto:", error);
-            }
+    // Eliminar auto
+    window.deleteAuto = async (id) => {
+        if (!confirm("⚠️ ¿Estás seguro de eliminar este auto?")) return;
+        
+        try {
+            const response = await fetch(`${API_URL}/eliminar-auto/${id}`, { method: "DELETE" });
+
+            if (!response.ok) throw new Error("Error al eliminar el auto.");
+
+            alert("✅ Auto eliminado correctamente.");
+            fetchAutos();
+        } catch (error) {
+            console.error("❌ Error al eliminar el auto:", error);
+            alert("❌ No se pudo eliminar el auto.");
         }
+    };
 
-        // Cargar autos al inicio
-        fetchAutos();
+    // Cargar autos al iniciar la página
+    fetchAutos();
+});
     </script>
 </body>
 </html>

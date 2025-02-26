@@ -174,59 +174,81 @@ app.post('/guardar-mantenimiento', async (req, res) => {
 });
 
 
-// Guardar un auto
+// Guardar un auto con verificación de datos y errores detallados
 app.post('/guardar-auto', async (req, res) => {
+    console.log("📥 Datos recibidos en /guardar-auto:", req.body); // 👈 LOG IMPORTANTE
     try {
-        console.log("Datos recibidos en /guardar-auto:", req.body); // 👈 Verifica qué datos llegan
         const nuevoAuto = new Auto(req.body);
         await nuevoAuto.save();
+        console.log("✅ Auto guardado:", nuevoAuto);
         res.send("Auto guardado exitosamente.");
     } catch (error) {
-        console.error("Error al guardar el auto:", error);
+        console.error("❌ Error al guardar el auto:", error);
         res.status(500).send("Error al guardar el auto.");
     }
 });
 
 
-// Obtener todos los autos
+// Obtener todos los autos con validación de respuesta
 app.get('/obtener-autos', async (req, res) => {
     try {
+        console.log("📤 Solicitando lista de autos...");
         const autos = await Auto.find();
+        if (autos.length === 0) {
+            console.log("⚠ No hay autos registrados.");
+            return res.status(404).json({ mensaje: "No hay autos registrados." });
+        }
+        console.log("✅ Autos obtenidos:", autos.length);
         res.json(autos);
     } catch (error) {
-        console.error("Error al obtener autos:", error);
-        res.status(500).send("Error al obtener los autos.");
+        console.error("❌ Error al obtener autos:", error);
+        res.status(500).json({ error: "Error al obtener los autos.", detalle: error.message });
     }
 });
 
-// Eliminar un auto por ID
+// Eliminar un auto con validación
 app.delete('/eliminar-auto/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        await Auto.findByIdAndDelete(id);
-        res.send("Auto eliminado exitosamente.");
-    } catch (error) {
-        console.error("Error al eliminar el auto:", error);
-        res.status(500).send("Error al eliminar el auto.");
-    }
-});
+        console.log("🗑 Eliminando auto con ID:", id);
 
-// Editar un auto
-app.put('/editar-auto', async (req, res) => {
-    try {
-        const { id, marca, modelo, precio } = req.body;
-        const autoActualizado = await Auto.findByIdAndUpdate(id, { marca, modelo, precio }, { new: true });
-
-        if (!autoActualizado) {
-            return res.status(404).send("Auto no encontrado.");
+        const autoEliminado = await Auto.findByIdAndDelete(id);
+        if (!autoEliminado) {
+            console.log("⚠ No se encontró el auto con ID:", id);
+            return res.status(404).json({ error: "Auto no encontrado." });
         }
 
-        res.send("Auto actualizado correctamente.");
+        console.log("✅ Auto eliminado:", autoEliminado);
+        res.json({ mensaje: "Auto eliminado exitosamente.", auto: autoEliminado });
+
     } catch (error) {
-        console.error("Error al editar el auto:", error);
-        res.status(500).send("Error al actualizar el auto.");
+        console.error("❌ Error al eliminar el auto:", error);
+        res.status(500).json({ error: "Error al eliminar el auto.", detalle: error.message });
     }
 });
+
+// Editar un auto con validación de existencia
+app.put('/editar-auto/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log("✏ Editando auto con ID:", id, "📩 Nuevos datos:", req.body);
+
+        const autoActualizado = await Auto.findByIdAndUpdate(id, req.body, { new: true });
+
+        if (!autoActualizado) {
+            console.log("⚠ No se encontró el auto con ID:", id);
+            return res.status(404).json({ error: "Auto no encontrado." });
+        }
+
+        console.log("✅ Auto actualizado:", autoActualizado);
+        res.json({ mensaje: "Auto actualizado exitosamente.", auto: autoActualizado });
+
+    } catch (error) {
+        console.error("❌ Error al editar el auto:", error);
+        res.status(500).json({ error: "Error al editar el auto.", detalle: error.message });
+    }
+});
+
 
 
 

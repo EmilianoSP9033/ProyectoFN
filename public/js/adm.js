@@ -1,84 +1,99 @@
+const API_URL = "https://crispy-engine-5grj7jpvvrjp349q6-3000.app.github.dev";
 
-document.addEventListener('DOMContentLoaded', () => {
-    const carForm = document.getElementById('carForm');
-    const carTable = document.getElementById('carTable').querySelector('tbody');
-    let cars = JSON.parse(localStorage.getItem('cars')) || []; // Obtener autos almacenados o array vacío
+document.addEventListener("DOMContentLoaded", () => {
+    const carForm = document.getElementById("carForm");
+    const carTable = document.getElementById("carTable").querySelector("tbody");
+    let editingCarId = null; // Guardar el ID del auto en edición
 
-    // Función para renderizar la tabla de autos
-    const renderCars = () => {
-        carTable.innerHTML = ''; // Limpiar tabla
-        cars.forEach((car, index) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${car.marca}</td>
-                <td>${car.modelo}</td>
-                <td>$${car.precio}</td>
-                <td>
-                    <button class="edit" data-index="${index}">Editar</button>
-                    <button class="delete" data-index="${index}">Eliminar</button>
-                </td>
-            `;
-            carTable.appendChild(row);
-        });
-    };
+    // Obtener autos desde el backend
+    async function fetchAutos() {
+        try {
+            const response = await fetch(`${API_URL}/obtener-autos`);
+            const autos = await response.json();
 
-    // Función para agregar un auto
-    const addCar = (e) => {
+            carTable.innerHTML = "";
+            autos.forEach(auto => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${auto.marca}</td>
+                    <td>${auto.modelo}</td>
+                    <td>$${auto.precio}</td>
+                    <td>
+                        <button onclick="editAuto('${auto._id}', '${auto.marca}', '${auto.modelo}', ${auto.precio})">Editar</button>
+                        <button onclick="deleteAuto('${auto._id}')">Eliminar</button>
+                    </td>
+                `;
+                carTable.appendChild(row);
+            });
+        } catch (error) {
+            console.error("❌ Error al obtener los autos:", error);
+        }
+    }
+
+    // Agregar o actualizar un auto
+    carForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const marca = document.getElementById('marca').value;
-        const modelo = document.getElementById('modelo').value;
-        const precio = document.getElementById('precio').value;
 
-        if (marca && modelo && precio) {
-            const newCar = { marca, modelo, precio: parseFloat(precio) };
-            cars.push(newCar); // Agregar el nuevo auto a la lista
-            localStorage.setItem('cars', JSON.stringify(cars)); // Guardar los autos actualizados en localStorage
-            renderCars(); // Renderizar la tabla actualizada
-            carForm.reset(); // Limpiar formulario
-        } else {
-            alert("Por favor, completa todos los campos.");
-        }
-    };
+        const marca = document.getElementById("marca").value;
+        const modelo = document.getElementById("modelo").value;
+        const precio = parseFloat(document.getElementById("precio").value);
+        const car = { marca, modelo, precio };
 
-    // Función para editar un auto
-    const editCar = (index) => {
-        const car = cars[index];
-        const newMarca = prompt('Editar Marca:', car.marca);
-        const newModelo = prompt('Editar Modelo:', car.modelo);
-        const newPrecio = prompt('Editar Precio:', car.precio);
+        try {
+            let response;
+            if (editingCarId) {
+                response = await fetch(`${API_URL}/editar-auto/${editingCarId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(car)
+                });
+                editingCarId = null;
+            } else {
+                response = await fetch(`${API_URL}/guardar-auto`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(car)
+                });
+            }
 
-        if (newMarca && newModelo && newPrecio) {
-            // Actualizar los datos del auto
-            cars[index] = { marca: newMarca, modelo: newModelo, precio: parseFloat(newPrecio) };
-            localStorage.setItem('cars', JSON.stringify(cars)); // Actualizar los autos en localStorage
-            renderCars(); // Renderizar la tabla actualizada
-        }
-    };
-
-    // Función para eliminar un auto
-    const deleteCar = (index) => {
-        if (confirm('¿Estás seguro de que deseas eliminar este auto?')) {
-            cars.splice(index, 1); // Eliminar el auto de la lista
-            localStorage.setItem('cars', JSON.stringify(cars)); // Actualizar los autos en localStorage
-            renderCars(); // Renderizar la tabla actualizada
-        }
-    };
-
-    // Eventos dinámicos para Editar y Eliminar
-    carTable.addEventListener('click', (e) => {
-        const target = e.target;
-        const index = target.dataset.index;
-
-        if (target.classList.contains('edit')) {
-            editCar(index);
-        } else if (target.classList.contains('delete')) {
-            deleteCar(index);
+            if (response.ok) {
+                alert(editingCarId ? "Auto actualizado correctamente." : "Auto agregado correctamente.");
+                carForm.reset();
+                fetchAutos();
+            } else {
+                alert("❌ Error al procesar la solicitud.");
+            }
+        } catch (error) {
+            console.error("❌ Error al procesar el auto:", error);
         }
     });
 
-    // Evento para agregar un auto
-    carForm.addEventListener('submit', addCar);
+    // Editar auto
+    window.editAuto = (id, marca, modelo, precio) => {
+        document.getElementById("marca").value = marca;
+        document.getElementById("modelo").value = modelo;
+        document.getElementById("precio").value = precio;
+        editingCarId = id;
+    };
 
-    // Renderizar los autos al cargar la página
-    renderCars();
+    // Eliminar auto
+    window.deleteAuto = async (id) => {
+        if (confirm("¿Estás seguro de eliminar este auto?")) {
+            try {
+                const response = await fetch(`${API_URL}/eliminar-auto/${id}`, { method: "DELETE" });
+
+                if (response.ok) {
+                    alert("Auto eliminado correctamente.");
+                    fetchAutos();
+                } else {
+                    alert("❌ Error al eliminar el auto.");
+                }
+            } catch (error) {
+                console.error("❌ Error al eliminar el auto:", error);
+            }
+        }
+    };
+
+    // Cargar autos al iniciar la página
+    fetchAutos();
 });
