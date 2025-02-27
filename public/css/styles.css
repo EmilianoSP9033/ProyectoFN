@@ -201,7 +201,7 @@ body {
 }
 
 .prueba-manejo {
-    background-image: url("/public/images/Imagen_prueba_de_conduccion");
+    background-image: url("images/");
 }
 
 .cita-servicio {
